@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NATO Political Economy: Budgets, Spending, and US Defense Industry Returns</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-btn.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+            font-weight: 600;
+            background-color: #eff6ff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Slate Navy & Steel Blue with Warm Neutral Slate Canvas -->
+    <!-- Application Structure Plan: The app is structured as an interactive analytical dashboard analyzing NATO political economy budgets. The goal is to provide a fact-based, quantified response to political myths (such as MAGA narratives). The layout features 5 thematic tabs: 1) Synthesis & MAGA Mythbuster (interactive rebuttal generator and matrix), 2) NATO Budgets (direct common budget vs 2% GDP national spending), 3) Pentagon Breakdown (showing <1.5% dedicated to Europe), 4) Industrial Returns (FMS sales, 63% EU procurement capture, filterable arms deal table), and 5) Economic Multipliers (F-35 economies of scale, long-term maintenance rents, ITAR lock-in). -->
+    <!-- Visualization & Content Choices: 
+    1. Direct NATO Common Budget Shares -> Doughnut Chart (Chart.js / Canvas) -> Highlights 14.9% strict parity between US and Germany.
+    2. Progress on 2% GDP Target (2014-2026) -> Bar Chart (Chart.js / Canvas) -> Demonstrates rapid European rearmament.
+    3. Share of Europe in Pentagon Budget -> Pie Chart (Chart.js / Canvas) -> Proves <1.5% of DoD budget goes to European security.
+    4. US Share of EU Defense Acquisitions -> Doughnut Chart (Chart.js / Canvas) -> Proves 63% US capture of EU external procurement.
+    5. FMS Growth to Europe ($10B to $43B) -> Bar Chart (Chart.js / Canvas) -> Shows quadrupling of direct defense sales.
+    6. Major Arms Deals Explorer -> Dynamic HTML Table + JS filters by country/contractor -> Enables detailed inspection of multi-billion dollar contracts.
+    7. Confirmation: No SVG or Mermaid.js used. HTML/CSS and Chart.js dynamic components only. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="bg-blue-600 text-white text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Economic & Strategic Analysis</span>
+                    <span class="text-xs text-slate-400">Sources: SIPRI, EU EDIS & US State Dept</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-100 mt-1">NATO Spending & US Defense Industry Returns</h1>
+                <p class="text-xs sm:text-sm text-slate-300">Who funds whom? Quantifying military financial burden vs. industrial windfalls</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="#maga-generator" class="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm flex items-center gap-2">
+                    <span>&#9889;</span> Mythbuster Argument Generator
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-2 h-full bg-blue-600"></div>
+                <p class="text-xs font-semibold uppercase text-slate-500 tracking-wider">Direct US NATO Share</p>
+                <p class="text-3xl font-extrabold text-slate-900 mt-1">14.90 %</p>
+                <p class="text-xs text-slate-600 mt-2"><span class="font-bold text-slate-800">Strict parity</span> with Germany (~$600M/yr) in NATO's direct common budget.</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-2 h-full bg-emerald-500"></div>
+                <p class="text-xs font-semibold uppercase text-slate-500 tracking-wider">US Share of EU Arms Imports</p>
+                <p class="text-3xl font-extrabold text-slate-900 mt-1">63 %</p>
+                <p class="text-xs text-slate-600 mt-2">Of all non-EU defense equipment purchases made by EU nations (2022-2023).</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-2 h-full bg-amber-500"></div>
+                <p class="text-xs font-semibold uppercase text-slate-500 tracking-wider">US FMS Sales to Europe</p>
+                <p class="text-3xl font-extrabold text-slate-900 mt-1">$43 Billion</p>
+                <p class="text-xs text-slate-600 mt-2">Reached in 2024 (up from $10B in 2020), representing <span class="font-bold text-slate-800">44% of total worldwide US FMS</span>.</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-2 h-full bg-indigo-600"></div>
+                <p class="text-xs font-semibold uppercase text-slate-500 tracking-wider">US Budget Spent on Europe</p>
+                <p class="text-3xl font-extrabold text-slate-900 mt-1">&lt; 1.5 %</p>
+                <p class="text-xs text-slate-600 mt-2">Of total US Department of Defense spending is actually dedicated to European security posture.</p>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="border-b border-slate-200 bg-slate-50/80 px-2 sm:px-4 pt-3 overflow-x-auto">
+                <nav class="flex space-x-2 sm:space-x-4 min-w-max" id="nav-tabs">
+                    <button onclick="switchTab('tab-synthesis')" id="btn-tab-synthesis" class="tab-btn active px-4 py-3 text-sm font-medium border-b-2 border-transparent rounded-t-lg transition flex items-center gap-2">
+                        <span>&#128269;</span> Synthesis & MAGA Mythbuster
+                    </button>
+                    <button onclick="switchTab('tab-budgets')" id="btn-tab-budgets" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent rounded-t-lg transition flex items-center gap-2">
+                        <span>&#128179;</span> NATO Budgets vs GDP (2%)
+                    </button>
+                    <button onclick="switchTab('tab-pentagon')" id="btn-tab-pentagon" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent rounded-t-lg transition flex items-center gap-2">
+                        <span>&#127758;</span> Real Cost of Pentagon Ops
+                    </button>
+                    <button onclick="switchTab('tab-fms')" id="btn-tab-fms" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent rounded-t-lg transition flex items-center gap-2">
+                        <span>&#128640;</span> Industrial Returns & FMS
+                    </button>
+                    <button onclick="switchTab('tab-multipliers')" id="btn-tab-multipliers" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent rounded-t-lg transition flex items-center gap-2">
+                        <span>&#128200;</span> Scale Economies & Rents
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-6">
+
+                <div id="tab-synthesis" class="tab-content space-y-8">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-900 mb-2">Context & Analytical Objectives</h2>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            This section directly contrasts political rhetoric—which claims European allies are "free-riders" subsidized by American taxpayers—against empirical financial data. While the US global defense budget dwarfs European spending, the Atlantic Alliance functions simultaneously as a powerful export engine and cost-reducer for the US defense-industrial base.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-md font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <span class="bg-slate-200 text-slate-800 px-2 py-0.5 rounded text-xs">Comparative Matrix</span>
+                            Confrontation: MAGA Rhetoric vs. Fact-Based Reality
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 uppercase text-xs">
+                                        <th class="p-3 w-1/4">Topic / Political Narrative</th>
+                                        <th class="p-3 w-1/3 bg-red-50/50 text-red-900">MAGA / Political Claim</th>
+                                        <th class="p-3 w-1/3 bg-emerald-50/50 text-emerald-900">Fact-Based Reality & Key Figures</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    <tr>
+                                        <td class="p-3 font-semibold text-slate-900">NATO Direct Common Budget</td>
+                                        <td class="p-3 text-slate-700 bg-red-50/20 font-medium">"The US pays for almost the entire operating cost of NATO."</td>
+                                        <td class="p-3 text-slate-700 bg-emerald-50/20">
+                                            <span class="font-bold text-emerald-800">False.</span> The US direct contribution is strictly capped at <span class="font-bold">14.90%</span> (~$600M/yr), exactly matching Germany's share.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-semibold text-slate-900">Cost of US Forces in Europe</td>
+                                        <td class="p-3 text-slate-700 bg-red-50/20 font-medium">"The whole Pentagon budget goes toward protecting ungrateful European allies."</td>
+                                        <td class="p-3 text-slate-700 bg-emerald-50/20">
+                                            <span class="font-bold text-emerald-800">Misleading.</span> Less than $15B/yr (&lt;1.5% of the DoD budget) supports European posture. Most funding goes to global dominance & Indo-Pacific operations.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-semibold text-slate-900">Direct Industrial Returns</td>
+                                        <td class="p-3 text-slate-700 bg-red-50/20 font-medium">"Europeans take free defense and give nothing back to the US economy."</td>
+                                        <td class="p-3 text-slate-700 bg-emerald-50/20">
+                                            <span class="font-bold text-emerald-800">Debunked by trade data.</span> <span class="font-bold">63%</span> of non-EU defense equipment purchases made by EU states go to US suppliers. US Foreign Military Sales (FMS) to Europe hit $43B in 2024.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-semibold text-slate-900">Impact on US Equipment Costs</td>
+                                        <td class="p-3 text-slate-700 bg-red-50/20 font-medium">"Funding NATO inflates costs for American taxpayers."</td>
+                                        <td class="p-3 text-slate-700 bg-emerald-50/20">
+                                            <span class="font-bold text-emerald-800">Opposite effect.</span> Orders for the F-35 from 13 European nations create massive economies of scale, driving unit costs below $85M for the Pentagon.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-semibold text-slate-900">US Base Support in Europe</td>
+                                        <td class="p-3 text-slate-700 bg-red-50/20 font-medium">"US bases in Europe are a one-sided financial drain on American taxpayers."</td>
+                                        <td class="p-3 text-slate-700 bg-emerald-50/20">
+                                            <span class="font-bold text-emerald-800">Co-funded & Strategic.</span> Germany provides ~$1B/yr in direct host nation support and tax exemptions. These bases act as essential staging hubs for US operations in the Middle East & Africa.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="maga-generator" class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 rounded-xl shadow-lg space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <div>
+                                <h3 class="text-lg font-bold flex items-center gap-2">
+                                    <span>&#9889;</span> Anti-MAGA Fact-Based Argument Generator
+                                </h3>
+                                <p class="text-xs text-slate-300">Select a political claim to generate a concise, data-backed rebuttal ready to share.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-slate-300 uppercase">Select Political Myth:</label>
+                                <select id="maga-selector" onchange="updateMagaResponse()" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500">
+                                    <option value="0">1. "The US pays for the entire NATO budget"</option>
+                                    <option value="1">2. "The US military budget is spent defending Europe"</option>
+                                    <option value="2">3. "European rearmament doesn't benefit the US economy"</option>
+                                    <option value="3">4. "Allies buying weapons inflates costs for the Pentagon"</option>
+                                    <option value="4">5. "US bases in Europe cost taxpayers too much money"</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2 bg-slate-800/90 border border-slate-700 p-4 rounded-lg relative space-y-2">
+                                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                                    <span class="text-xs font-bold text-blue-400 uppercase tracking-wider" id="maga-topic-title">Topic: Direct NATO Budget</span>
+                                    <button onclick="copyMagaText()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1 rounded transition flex items-center gap-1">
+                                        <span id="copy-icon">&#128203;</span> <span id="copy-text">Copy Argument</span>
+                                    </button>
+                                </div>
+                                <p class="text-sm font-medium text-slate-200 italic" id="maga-claim">"The US pays for the entire NATO budget..."</p>
+                                <p class="text-sm text-slate-300 leading-relaxed pt-1" id="maga-fact">Fact-based rebuttal loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-budgets" class="tab-content space-y-8 hidden">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-900 mb-2">Understanding NATO Budgets: Direct Common vs. National Defense</h2>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            A central confusion in public debate is mixing up the <strong>NATO direct common budget</strong> (funding HQ operations, AWACS fleets, shared pipelines) with <strong>national defense spending</strong> (the 2% GDP target). While the direct budget is cost-shared strictly according to Gross National Income, sovereign national defense spending in Europe has surged dramatically since 2022.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <h3 class="text-sm font-bold text-slate-900 flex items-center justify-between">
+                                <span>NATO Direct Common Budget Cost Sharing</span>
+                                <span class="text-xs text-slate-500 font-normal">~$4.1B - $4.6B/yr</span>
+                            </h3>
+                            <p class="text-xs text-slate-600">Official cost-share formula for civil, military, and Security Investment Program (NSIP) budgets.</p>
+                            <div class="chart-container">
+                                <canvas id="chartDirectBudget"></canvas>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-xs text-blue-900">
+                                <strong>Key Takeaway:</strong> The US share (14.90%) is strictly matched by Germany (14.90%). The US does not subsidize NATO's day-to-day common budget.
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <h3 class="text-sm font-bold text-slate-900 flex items-center justify-between">
+                                <span>Allies Reaching the 2% GDP Defense Target</span>
+                                <span class="text-xs text-slate-500 font-normal">Newport 2014 Target</span>
+                            </h3>
+                            <p class="text-xs text-slate-600">Growth in the number of NATO member nations spending at least 2% of GDP on defense.</p>
+                            <div class="chart-container">
+                                <canvas id="chartTwoPercent"></canvas>
+                            </div>
+                            <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100 text-xs text-emerald-900">
+                                <strong>Strategic Shift:</strong> From only 3 countries in 2014, over 23 allies meet or exceed 2% in 2025/2026. Poland allocates <span class="font-bold">4.12%</span> of its GDP to defense!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-pentagon" class="tab-content space-y-8 hidden">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-900 mb-2">Pentagon Budget Breakdown: A Global Strategic Mandate</h2>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            Attributing the entire US military budget (~$997 Billion) to European defense is a major methodological error. The US Department of Defense (DoD) funds a global force primarily focused on strategic competition with China in the Indo-Pacific, maintaining power projection in the Middle East, and modernizing the US nuclear triad. Costs dedicated specifically to European security are minimal and offset by local host contributions.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <h3 class="text-sm font-bold text-slate-900">Department of Defense Budget Allocation (2024)</h3>
+                            <p class="text-xs text-slate-600">Share allocated to European theater posture vs. global US military operations.</p>
+                            <div class="chart-container">
+                                <canvas id="chartPentagon"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                                <h4 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">Breakdown of Specific US Allocations in Europe</h4>
+                                <ul class="space-y-3 text-xs text-slate-700">
+                                    <li class="flex justify-between items-start">
+                                        <div>
+                                            <span class="font-bold text-slate-900">European Deterrence Initiative (EDI):</span>
+                                            <p class="text-slate-500">Rotational deployments, exercises, and equipment prepositioning.</p>
+                                        </div>
+                                        <span class="bg-slate-100 text-slate-800 px-2 py-1 rounded font-bold">$3.7 - $6.5B / yr</span>
+                                    </li>
+                                    <li class="flex justify-between items-start border-t border-slate-100 pt-2">
+                                        <div>
+                                            <span class="font-bold text-slate-900">Operating Cost of European Bases & Troops:</span>
+                                            <p class="text-slate-500">100,000 personnel across 119 bases in Germany, 44 in Italy, 25 in UK.</p>
+                                        </div>
+                                        <span class="bg-slate-100 text-slate-800 px-2 py-1 rounded font-bold">$7.0 - $10.0B / yr</span>
+                                    </li>
+                                    <li class="flex justify-between items-start border-t border-slate-100 pt-2">
+                                        <div>
+                                            <span class="font-bold text-emerald-800">Host Nation Support (Off-setting Funds):</span>
+                                            <p class="text-slate-500">Direct cash payments and tax waivers provided by European allies (e.g., Germany).</p>
+                                        </div>
+                                        <span class="bg-emerald-100 text-emerald-900 px-2 py-1 rounded font-bold">~$1.0B / yr</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
+                                <p class="font-bold">Strategic Value of European Basing:</p>
+                                <p class="leading-relaxed">
+                                    Congressional Research Service (CRS) studies show that redeploying these forces back to the continental US would yield zero net savings. Furthermore, these European bases are indispensable staging platforms for US power projection into the Middle East and Africa.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-fms" class="tab-content space-y-8 hidden">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-900 mb-2">Industrial Capture: Europe as the Primary Market for US Defense Industry</h2>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            While net US military operational expenditure in Europe remains minimal, European rearmament acts as a major revenue engine for American defense prime contractors. Through Foreign Military Sales (FMS), Europe has become the fastest-growing market for US defense exports.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <h3 class="text-sm font-bold text-slate-900">Origin of EU Defense Procurement Imports (2022-2023)</h3>
+                            <p class="text-xs text-slate-600">Official figures from the European Defence Industrial Strategy (EDIS).</p>
+                            <div class="chart-container">
+                                <canvas id="chartEUAcquisitions"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <h3 class="text-sm font-bold text-slate-900">Surge in US Foreign Military Sales (FMS) to Europe</h3>
+                            <p class="text-xs text-slate-600">Annual dollar value of government-to-government arms contracts (Billions USD).</p>
+                            <div class="chart-container">
+                                <canvas id="chartFMSGrowth"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-3">
+                            <div>
+                                <h3 class="text-md font-bold text-slate-900">Major Recent European Procurement Deals Explorer</h3>
+                                <p class="text-xs text-slate-500">Filter key arms contracts awarded by European nations to US defense contractors</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                                <input type="text" id="deal-search" onkeyup="filterDeals()" placeholder="Search (e.g., F-35, Poland)..." class="bg-slate-50 border border-slate-300 text-xs rounded-lg p-2 focus:ring-2 focus:ring-blue-500 flex-grow sm:flex-grow-0">
+                                <select id="country-filter" onchange="filterDeals()" class="bg-slate-50 border border-slate-300 text-xs rounded-lg p-2 focus:ring-2 focus:ring-blue-500">
+                                    <option value="ALL">All Countries</option>
+                                    <option value="Poland">Poland</option>
+                                    <option value="Germany">Germany</option>
+                                    <option value="Czechia">Czechia</option>
+                                    <option value="Denmark">Denmark</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse" id="deals-table">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                                        <th class="p-3">Weapon System</th>
+                                        <th class="p-3">Buying Nation</th>
+                                        <th class="p-3">Notified Value</th>
+                                        <th class="p-3">US Prime Contractor</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200" id="deals-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-multipliers" class="tab-content space-y-8 hidden">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-900 mb-2">Economic Feedback Loops: Scale Economies & Long-Term Rents</h2>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            European military purchases do not merely yield immediate export revenues; they trigger economic multipliers that lower unit costs directly for the US military while generating multi-decade service and maintenance rents for American firms.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                                <span class="bg-blue-100 text-blue-800 text-lg p-2.5 rounded-lg font-bold">&#9992;</span>
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900">Case Study: F-35 Lightning II Fighter Jet</h3>
+                                    <p class="text-xs text-slate-500">Unit cost reduction via aggregated allied demand</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Selected by 13 European air forces, the massive export order book allows Lockheed Martin to compress the flyaway unit cost below <strong>$85 Million</strong>.
+                            </p>
+                            <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-700 border border-slate-200">
+                                <strong>Pentagon Benefit:</strong> This lower production cost directly reduces procurement prices for the US Air Force, Navy, and Marine Corps, saving US taxpayers billions.
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                                <span class="bg-emerald-100 text-emerald-800 text-lg p-2.5 rounded-lg font-bold">&#128260;</span>
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900">30-to-50 Year Maintenance Rents (MRO)</h3>
+                                    <p class="text-xs text-slate-500">Long-term sustainment over weapon system lifecycle</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                The initial hardware sale accounts for only ~30% of a military platform's total lifecycle cost. The remaining <strong>70% is captured</strong> through software updates, spare parts, and overhaul contracts.
+                            </p>
+                            <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-700 border border-slate-200">
+                                <strong>Pentagon Benefit:</strong> Creates a captive, guaranteed financial flow for decades benefiting US giants (Lockheed, RTX, Boeing, General Dynamics, Northrop Grumman).
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                                <span class="bg-amber-100 text-amber-800 text-lg p-2.5 rounded-lg font-bold">&#128274;</span>
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900">Regulatory Lock-In & ITAR Controls</h3>
+                                    <p class="text-xs text-slate-500">Permanent extraterritorial technology oversight</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                US International Traffic in Arms Regulations (ITAR) grant the US Department of State permanent veto power over any modifications, third-party transfers, or tech integration.
+                            </p>
+                            <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-700 border border-slate-200">
+                                <strong>Pentagon Benefit:</strong> Prevents European allies from establishing fully autonomous, competing defense-industrial ecosystems.
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                                <span class="bg-indigo-100 text-indigo-800 text-lg p-2.5 rounded-lg font-bold">&#128184;</span>
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900">US Private Equity Penetration in EU Defense Tech</h3>
+                                    <p class="text-xs text-slate-500">Venture capital and M&A acquisitions</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Out of $5.2 Billion invested in European defense tech start-ups, a quarter of all capital originated from US Private Equity funds, a share projected to reach <strong>45% by 2025</strong>.
+                            </p>
+                            <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-700 border border-slate-200">
+                                <strong>Pentagon Benefit:</strong> Captures emerging European technological IP directly into US financial and defense holding structures.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p>© 2026 Strategic & Economic Analysis - North Atlantic Treaty Organization</p>
+            <p>Based on empirical data from SIPRI, the European Commission (EDIS), and the US Department of State.</p>
+        </div>
+    </footer>
+
+    <script>
+        const magaData = [
+            {
+                topic: "Topic: NATO Direct Common Budget",
+                claim: "« The United States pays for almost the entire NATO budget while Europe pays nothing. »",
+                fact: "Factually false. The direct common budget of NATO (~$4.5B/yr) covers HQ operations and shared radar fleets based on GNI. The US share is strictly capped at 14.90% (~$600M/yr), identical to Germany's 14.90% share. The remaining 30 allies pay 70% of the cost."
+            },
+            {
+                topic: "Topic: US Defense Budget",
+                claim: "« The $1 Trillion US military budget exists solely to defend ungrateful European allies. »",
+                fact: "Misleading. Less than $15 Billion annually (<1.5% of the total DoD budget) is spent on European force posture and the EDI. The US defense budget funds global power projection, nuclear deterrence, and primary operations in the Indo-Pacific region."
+            },
+            {
+                topic: "Topic: Arms Sales & Economic Returns",
+                claim: "« European rearmament doesn't benefit American workers or taxpayers at all. »",
+                fact: "Debunked by trade figures. Between 2022 and 2023, 63% of all non-EU defense purchases made by European states went to US manufacturers. In 2024 alone, Europe bought $43 Billion in US weaponry through Foreign Military Sales (FMS)."
+            },
+            {
+                topic: "Topic: Unit Cost & Economies of Scale",
+                claim: "« Producing weapons for foreign allies inflates costs for the US military. »",
+                fact: "The exact opposite happens. Because 13 European nations ordered the F-35 fighter, Lockheed Martin achieved massive production scale, dropping the per-unit price below $85 Million and directly saving billions of dollars for the US military."
+            },
+            {
+                topic: "Topic: Bases & Host Support",
+                claim: "« US bases in Europe are a free subsidy granted to European governments. »",
+                fact: "Host nations heavily subsidize these bases. Germany provides ~$1 Billion per year in direct cash support, infrastructure work, and tax relief. Furthermore, major bases like Ramstein act as vital command hubs for US operations in the Middle East and Africa."
+            }
+        ];
+
+        const dealsData = [
+            { system: "AH-64E Apache Attack Helicopters (96)", country: "Poland", value: "$12.0 Billion", company: "Boeing / Lockheed Martin" },
+            { system: "HIMARS Rocket Artillery Systems", country: "Poland", value: "$10.0 Billion", company: "Lockheed Martin" },
+            { system: "CH-47F Chinook Heavy Helicopters", country: "Germany", value: "$8.5 Billion", company: "Boeing" },
+            { system: "F-35A Lightning II Fighters & Munitions", country: "Czechia", value: "$5.6 Billion", company: "Lockheed Martin" },
+            { system: "IBCS Air Defense Command System", country: "Poland", value: "$4.0 Billion", company: "Northrop Grumman" },
+            { system: "AMRAAM & Air Defense Systems", country: "Denmark", value: "$3.7 Billion", company: "Northrop Grumman / RTX" },
+            { system: "M1A1 / M1A2 Abrams Main Battle Tanks", country: "Poland", value: "$3.75 Billion", company: "General Dynamics" },
+            { system: "AIM-120C-8 AMRAAM Missiles", country: "Germany", value: "$2.9 Billion", company: "RTX (Raytheon)" },
+            { system: "Patriot PAC-3 Air Defense Systems", country: "Germany", value: "Multi-Billion $", company: "RTX / Lockheed Martin" }
+        ];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+
+        function updateMagaResponse() {
+            const index = document.getElementById('maga-selector').value;
+            const data = magaData[index];
+            
+            document.getElementById('maga-topic-title').innerText = data.topic;
+            document.getElementById('maga-claim').innerText = data.claim;
+            document.getElementById('maga-fact').innerText = data.fact;
+        }
+
+        function copyMagaText() {
+            const index = document.getElementById('maga-selector').value;
+            const data = magaData[index];
+            const textToCopy = `${data.claim}\n\nFACT-BASED REBUTTAL:\n${data.fact}`;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const text = document.getElementById('copy-text');
+                text.innerText = 'Copied!';
+                setTimeout(() => {
+                    text.innerText = 'Copy Argument';
+                }, 2000);
+            });
+        }
+
+        function renderDeals(data) {
+            const body = document.getElementById('deals-table-body');
+            body.innerHTML = '';
+            
+            data.forEach(deal => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-50 border-b border-slate-100';
+                row.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-900">${deal.system}</td>
+                    <td class="p-3"><span class="bg-slate-100 text-slate-800 px-2 py-0.5 rounded font-medium">${deal.country}</span></td>
+                    <td class="p-3 font-bold text-blue-700">${deal.value}</td>
+                    <td class="p-3 text-slate-700">${deal.company}</td>
+                `;
+                body.appendChild(row);
+            });
+        }
+
+        function filterDeals() {
+            const searchTerm = document.getElementById('deal-search').value.toLowerCase();
+            const countryTerm = document.getElementById('country-filter').value;
+            
+            const filtered = dealsData.filter(deal => {
+                const matchesSearch = deal.system.toLowerCase().includes(searchTerm) || 
+                                      deal.company.toLowerCase().includes(searchTerm) ||
+                                      deal.country.toLowerCase().includes(searchTerm);
+                const matchesCountry = countryTerm === 'ALL' || deal.country === countryTerm;
+                return matchesSearch && matchesCountry;
+            });
+            
+            renderDeals(filtered);
+        }
+
+        function initCharts() {
+            const ctx1 = document.getElementById('chartDirectBudget').getContext('2d');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['United States (14.9%)', 'Germany (14.9%)', 'United Kingdom (10.3%)', 'France (10.1%)', 'Other 28 Allies (49.8%)'],
+                    datasets: [{
+                        data: [14.90, 14.90, 10.33, 10.10, 49.77],
+                        backgroundColor: ['#2563eb', '#0284c7', '#0d9488', '#d97706', '#94a3b8'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return context.label + ': ' + context.raw + '% of direct common budget'; }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('chartTwoPercent').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Newport Summit (2014)', 'Post-Ukraine Invasion (2024)', 'Projections (2025-2026)'],
+                    datasets: [{
+                        label: 'Nations Spending >= 2% GDP on Defense',
+                        data: [3, 18, 23],
+                        backgroundColor: '#0284c7',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 32, ticks: { stepSize: 5 } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            const ctx3 = document.getElementById('chartPentagon').getContext('2d');
+            new Chart(ctx3, {
+                type: 'pie',
+                data: {
+                    labels: ['Global Operations (Indo-Pacific, US, Nuclear)', 'European Forces Posture (~1%)', 'European Deterrence Initiative (<0.7%)'],
+                    datasets: [{
+                        data: [980, 10, 6.5],
+                        backgroundColor: ['#0f172a', '#2563eb', '#38bdf8'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return context.label + ': ~$' + context.raw + ' Billion'; }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const ctx4 = document.getElementById('chartEUAcquisitions').getContext('2d');
+            new Chart(ctx4, {
+                type: 'doughnut',
+                data: {
+                    labels: ['US Defense Suppliers (63%)', 'Other Non-EU (15%)', 'EU Domestic Producers (22%)'],
+                    datasets: [{
+                        data: [63, 15, 22],
+                        backgroundColor: ['#2563eb', '#64748b', '#10b981'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+
+            const ctx5 = document.getElementById('chartFMSGrowth').getContext('2d');
+            new Chart(ctx5, {
+                type: 'bar',
+                data: {
+                    labels: ['2020', '2022', '2024'],
+                    datasets: [{
+                        label: 'US FMS Arms Sales to Europe ($ Billions)',
+                        data: [10, 26, 43],
+                        backgroundColor: '#d97706',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: function(v) { return '$' + v + 'B'; } } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            updateMagaResponse();
+            renderDeals(dealsData);
+        });
+    </script>
+</body>
+</html>
